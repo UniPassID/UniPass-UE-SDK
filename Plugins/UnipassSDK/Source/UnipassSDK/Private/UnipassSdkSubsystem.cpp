@@ -46,7 +46,7 @@ void UUnipassSdkSubsystem::Init(
 	if (Development == EDevelopment::mainnet) 
 		WalletURL = "https://wallet.unipass.id/";
 	else
-		WalletURL = "https://t.wallet.unipass.vip/";
+		WalletURL = "https://testnet.wallet.unipass.id/";
 
 	UE_LOG(LogTemp, Log, TEXT("Unipass subsystem initialized Url=%s"), *WalletURL);
 
