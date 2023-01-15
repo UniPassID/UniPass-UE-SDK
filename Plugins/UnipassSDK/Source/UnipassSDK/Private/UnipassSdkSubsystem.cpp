@@ -61,9 +61,14 @@ void UUnipassSdkSubsystem::Init(
 	MyBrowser->OnBrowserClosed.Unbind();
 	MyBrowser->OnBrowserClosed.BindLambda([&](const bool bFromUser)
 	{
-		MyBrowser->SetVisibility(ESlateVisibility::Hidden);
+		MyBrowser->ClearCache();
 		MyBrowser->LoadUrl("about:blank");
-		UE_LOG(LogTemp, Log, TEXT("Unipass Browser Closed"));
+		MyBrowser->OnPageLoaded.Unbind();
+		MyBrowser->OnPageLoaded.BindLambda([&]()
+		{
+			MyBrowser->SetVisibility(ESlateVisibility::Hidden);
+			UE_LOG(LogTemp, Log, TEXT("Unipass Browser Closed"));
+		});
 	});
 }
 
@@ -114,6 +119,7 @@ void UUnipassSdkSubsystem::OnLogin(const FUnipassLoginData& LoginData)
 	LoginDataCached = LoginData;
 	OnLoginEvent.Broadcast(LoginData);
 	MyBrowser->BrowserClosed(true);
+	MyBrowser->ClearCache();
 	UE_LOG(LogTemp, Log, TEXT("Unipass OnLogin address:%s email:%s newborn:%s"), *LoginData.address, *LoginData.email, *LoginData.newborn);
 }
 
@@ -168,6 +174,8 @@ void UUnipassSdkSubsystem::OnSignMessage(const FString& Signature)
 
 	OnSignMessageEvent.Broadcast(Signature);
 	MyBrowser->BrowserClosed(true);
+	MyBrowser->ClearCache();
+
 	UE_LOG(LogTemp, Log, TEXT("Signature:%s"), *Signature);
 }
 
@@ -224,6 +232,7 @@ void UUnipassSdkSubsystem::OnSendTransaction(const FString& TxHash)
 
 	OnSendTransactionEvent.Broadcast(TxHash);
 	MyBrowser->BrowserClosed(true);
+	MyBrowser->ClearCache();
 	UE_LOG(LogTemp, Log, TEXT("TxHash:%s"), *TxHash);
 }
 
